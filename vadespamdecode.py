@@ -85,6 +85,13 @@ def printable_ratio(s: str) -> float:
 
 # ---------- Legacy OVH decoder ----------
 
+def looks_legacy_value(s: str) -> bool:
+    """
+    Legacy strings are typically all lowercase letters, with even length.
+    """
+    ss = re.sub(r"\s+", "", s)
+    return bool(re.fullmatch(r"[a-z]+", ss)) and (len(ss) % 2 == 0)
+
 def legacy_decode(msg: str) -> str:
     """
     Parity-aware decoder for legacy OVH/Vade obfuscation.
@@ -212,6 +219,8 @@ def pick_header_value(headers: Dict[str, str]) -> Tuple[Optional[str], Optional[
 
 def detect_mode(value: str) -> str:
     # Returns one of: 'vade1', 'legacy', 'base64', 'unknown'
+    if looks_legacy_value(value):
+        return "legacy"
     if is_base64ish(value):
         try:
             raw = safe_b64decode(value)
@@ -221,7 +230,7 @@ def detect_mode(value: str) -> str:
                 return "base64"
         except Exception:
             pass
-    return "legacy"
+    return "unknown"
 
 
 def run_on_value(value: str, mode: Optional[str], json_out: bool, try_zlib: bool, hdr_name: Optional[str] = None) -> int:
@@ -307,16 +316,16 @@ def main():
           vadespamdecode "dgxx..."
 
           # Base64 vade1 header from a file of headers:
-          vadespamdecode --file header.txt
+          vadespamdecode --file headers.txt
 
           # Read an .eml, auto-pick the spam-cause header and inspect:
           vadespamdecode --eml message.eml
 
           # JSON output:
-          vadespamdecode --json --file header.txt
+          vadespamdecode --json --file headers.txt
 
           # Try zlib probes (experimental) on vade1 containers:
-          vadespamdecode --try-zlib --file header.txt
+          vadespamdecode --try-zlib --file headers.txt
         """)
     )
     g = p.add_mutually_exclusive_group()
@@ -347,8 +356,8 @@ def main():
         else:
             m = re.search(
                 r'(?im)^\s*([^\s:]*spamcause[^\s:]*)\s*:\s*(.*?)'   # header match with "spamcause" + first line of value
-                r'(?:\r?\n[ \t].*?)*'                               # any folded continuation lines
-                r'(?=\r?\n(?![ \t])|$)',                            # stop before next non-folded header or EOF
+                r'(?:\r?\n[ \t].*?)*'                               # continuation lines
+                r'(?=\r?\n(?![ \t])|$)',                            # until next header or EOF
                 content,
             )
             if m:
