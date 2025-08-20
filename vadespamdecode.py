@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
+
 """
 vadespamdecode: CLI to decode/inspect legacy OVH/Vade spam-cause headers and the newer Base64 'vade1' container.
 
