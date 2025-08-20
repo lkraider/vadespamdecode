@@ -85,9 +85,9 @@ def printable_ratio(s: str) -> float:
 
 # ---------- Legacy OVH decoder ----------
 
-def legacy_decode_fixed(msg: str) -> str:
+def legacy_decode(msg: str) -> str:
     """
-    Fixed parity-aware decoder for legacy OVH/Vade obfuscation.
+    Parity-aware decoder for legacy OVH/Vade obfuscation.
     - Remove whitespace from the source (handles folded headers).
     - Process pairs; on even pair index, swap the two characters.
     - Compute offset and char value.
@@ -102,7 +102,7 @@ def legacy_decode_fixed(msg: str) -> str:
         b = msg[i+1]
         i += 2
 
-        # Swap on even pair index per fixed decoding
+        # Swap on even pair index
         if (pair_index % 2) == 0:
             a, b = b, a
 
@@ -243,14 +243,13 @@ def run_on_value(value: str, mode: Optional[str], json_out: bool, try_zlib: bool
     result["mode"] = detected
 
     if detected == "legacy":
-        decoded = legacy_decode_fixed(value)
+        decoded = legacy_decode(value)
         result["legacy"] = {
-            "decoder": "fixed-parity-aware",
             "decoded": decoded,
             "printable_ratio": round(printable_ratio(decoded), 3),
         }
         if not json_out:
-            print("[Mode] legacy (fixed parity-aware decoder)")
+            print("[Mode] legacy")
             print("\n--- Decoded ---")
             print(decoded)
     elif detected in ("vade1", "base64"):
@@ -346,10 +345,16 @@ def main():
             detected_name = name
             header_value = val
         else:
-            m = re.search(r"(?im)^\s*(X-OVH-SPAMCAUSE|X-VR-SPAMCAUSE|X-Vade-Spamcause)\s*:\s*(.+)$", content)
+            m = re.search(
+                r'(?im)^\s*([^\s:]*spamcause[^\s:]*)\s*:\s*(.*?)'   # header match with "spamcause" + first line of value
+                r'(?:\r?\n[ \t].*?)*'                               # any folded continuation lines
+                r'(?=\r?\n(?![ \t])|$)',                            # stop before next non-folded header or EOF
+                content,
+            )
             if m:
                 detected_name = m.group(1)
-                header_value = m.group(2).strip()
+                # unfold: join continuation lines with a space
+                header_value = re.sub(r'\r?\n[ \t]+', ' ', m.group(2)).strip()
             else:
                 stripped = content.strip()
                 if is_base64ish(stripped):
