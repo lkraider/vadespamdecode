@@ -1,0 +1,6 @@
+From: nobody@example.com
+To: anybody@example.com
+Subject: No spamcause here
+X-Some-Header: value
+
+Body text.

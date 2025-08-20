@@ -1,0 +1,7 @@
+From: w@x
+To: y@z
+Subject: Weird spamcause header
+X-Custom-Quarantine-SpamCause-Detail: 
+ aGVsbG8gd29ybGQgLSBub3QgdmFkZTE=
+
+Body.

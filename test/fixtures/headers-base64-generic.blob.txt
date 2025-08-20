@@ -1,0 +1,6 @@
+From: g@example.com
+To: h@example.com
+Subject: Generic base64
+X-Whatever-SpamCause: aGVsbG8gd29ybGQgLSBub3QgdmFkZTE=
+
+Body.

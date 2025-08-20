@@ -1,0 +1,6 @@
+From: alice@example.com
+To: bob@example.com
+Subject: Legacy sample
+X-OVH-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrfeelgedrvdduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfenuceurghilhhouhhtmecufedttdenucgohfhorhgsihguuggvnhfjughrucdlhedttddm
+
+Body.
