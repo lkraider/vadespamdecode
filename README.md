@@ -1,7 +1,7 @@
 # vadespamdecode
 
 CLI tool to **decode or inspect** OVH/Vade “spam-cause” headers from email systems.
-It understands the **legacy OVH obfuscation** (decodable to human-readable text) and the **newer Vade Base64 container** (`vade1{…}`), which is **inspect-only**.
+It understands the **legacy OVH obfuscation** (decodable to human-readable text) and the **newer Vade Base64 container** (`vade1{…}`), which is **inspect-only** (the actual content is encrypted and this tool cannot decrypt it).
 
 ---
 
